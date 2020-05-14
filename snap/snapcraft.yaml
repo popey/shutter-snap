@@ -1,0 +1,151 @@
+name: shutter
+version: '0.94.2'
+summary: feature-rich screenshot program
+description: |
+  Shutter is a feature-rich screenshot program. You can take a
+  screenshot of a specific area, window, your whole screen, or even of
+  a website - apply different effects to it, draw on it to highlight
+  points, and then upload to an image hosting site, all within one
+  window.
+base: core
+
+layout:
+  /etc/gnome-vfs-2.0:
+    bind: $SNAP/etc/gnome-vfs-2.0
+  /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gnome-vfs-2.0:
+    bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gnome-vfs-2.0
+
+grade: stable
+confinement: strict
+
+slots:
+  dbus-shutter:
+    interface: dbus
+    bus: session
+    name: org.shutter-project.Shutter
+
+plugs:
+  gtk-2-engines:
+    interface: content
+    target: $SNAP/lib/gtk-2.0
+    default-provider: gtk2-common-themes:gtk-2-engines
+  gtk-2-themes:
+    interface: content
+    target: $SNAP/share/themes
+    default-provider: gtk2-common-themes:gtk-2-themes
+  icon-themes:
+    interface: content
+    target: $SNAP/share/icons
+    default-provider: gtk-common-themes:icon-themes
+
+apps: 
+  shutter:
+    common-id: org.shutter-project.Shutter
+    command: desktop-launch $SNAP/bin/shutter
+    plugs:
+      - x11
+      - desktop
+      - desktop-legacy
+      - pulseaudio
+      - home
+      - removable-media
+      - gsettings
+      - unity7
+      - network
+    environment:
+      LC_ALL: "C.UTF-8"
+      PERL5LIB: "$SNAP/usr/share/perl5/:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/perl/5.22.1/:$SNAP/usr/share/perl/5.22.1/:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/perl5/5.22/:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/perl/5.22/:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/perl-base/"
+      PERL_LOCAL_LIB_ROOT: "$SNAP/"
+      LD_LIBRARY_PATH: "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio/:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/perl/5.22.1/auto:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/perl/5.22.1/auto/Encode:$LD_LIBRARY_PATH"
+      TMPDIR: $XDG_RUNTIME_DIR
+      XDG_CURRENT_DESKTOP: Unity
+      GTK_PATH: $SNAP/lib/gtk-2.0
+      GTK_DATA_PREFIX: $SNAP
+      XDG_DATA_DIRS: $SNAP/share:$XDG_DATA_DIRS
+
+parts:
+  shutter:
+    after: [desktop-gtk2]
+    plugin: dump
+    source: https://launchpad.net/shutter/0.9x/0.94.2/+download/shutter-0.94.2.tar.gz
+    build-packages:
+      - sed
+      - libxml-sax-perl
+    override-build: |
+      snapcraftctl build
+      sed -i 's/convert/convert\-im6/g' ${SNAPCRAFT_PART_INSTALL}/bin/shutter
+      rm $SNAPCRAFT_PART_INSTALL/usr/share/perl5/XML/SAX/ParserDetails.ini
+      cp $SNAPCRAFT_PART_INSTALL/etc/perl/XML/SAX/ParserDetails.ini $SNAPCRAFT_PART_INSTALL/usr/share/perl5/XML/SAX/ParserDetails.ini
+    stage-packages:
+      - libgtk2-perl
+      - libglib-perl
+      - libgnomevfs2-0
+      - libgnome2-perl
+      - libgnome2-vfs-perl
+      - libgnome2-wnck-perl
+      - libgnome2-gconf-perl
+      - liblocale-gettext-perl
+      - libxml-simple-perl
+      - libxml-sax-perl
+      - libwww-mechanize-perl
+      - libwww-perl
+      - libimage-magick-perl
+      - libx11-protocol-perl
+      - librsvg2-common
+      - libfile-basedir-perl
+      - libfile-copy-recursive-perl
+      - libproc-simple-perl
+      - libfile-which-perl
+      - libsort-naturally-perl
+      - libgtk2-imageview-perl
+      - libgtk2-appindicator-perl
+      - libimage-exiftool-perl
+      - libnet-dbus-perl
+      - libgnome2-canvas-perl
+      - imagemagick
+      - libgtk2-unique-perl
+      - libproc-processtable-perl
+      - procps
+      - xdg-utils
+      - libpath-class-perl
+      - libjson-perl
+      - libjson-xs-perl
+      - libnet-dropbox-api-perl
+      - libx11-protocol-other-perl
+      - libgoocanvas-common
+      - libgoocanvas3
+      - libgoo-canvas-perl
+      - libjson-maybexs-perl
+      - libatk-adaptor
+      - libgail-common
+      - libcanberra-gtk-module
+      #- libdevel-trace-perl
+      - libxml-sax-expat-perl
+  desktop-gtk2:
+    build-packages:
+       - build-essential
+       - libgtk2.0-dev
+    make-parameters:
+       - FLAVOR=gtk2
+    plugin: make
+    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
+    source-subdir: gtk
+    stage-packages:
+      - libxkbcommon0
+      - ttf-ubuntu-font-family
+      - dmz-cursor-theme
+      - light-themes
+      - adwaita-icon-theme
+      - gnome-themes-standard
+      - shared-mime-info
+      - libgtk2.0-0
+      - libgdk-pixbuf2.0-0
+      - libglib2.0-bin
+      - libgtk2.0-bin
+      - unity-gtk2-module
+      - locales-all
+      - libappindicator1
+      - xdg-user-dirs
+      - ibus-gtk
+      - libibus-1.0-5
+
