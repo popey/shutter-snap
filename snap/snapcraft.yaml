@@ -1,5 +1,5 @@
 name: shutter
-version: '0.94.2'
+version: '0.94.3'
 summary: feature-rich screenshot program
 description: |
   Shutter is a feature-rich screenshot program. You can take a
@@ -67,7 +67,7 @@ parts:
   shutter:
     after: [desktop-gtk2]
     plugin: dump
-    source: https://launchpad.net/shutter/0.9x/0.94.2/+download/shutter-0.94.2.tar.gz
+    source: https://launchpad.net/shutter/0.9x/0.94.3/+download/shutter-0.94.3.tar.gz
     build-packages:
       - sed
       - libxml-sax-perl
