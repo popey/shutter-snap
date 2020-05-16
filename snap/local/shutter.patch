@@ -1,0 +1,31 @@
+--- shutter	2018-02-12 15:36:03.000000000 +1100
++++ shutter.patched	2018-07-02 12:59:10.031055698 +1000
+@@ -4316,7 +4316,7 @@
+         #show error dialog when installing the file
+         #monitor failed
+         unless ( $result eq 'ok' ) {
+-            $sd->dlg_error_message( Gnome2::VFS->result_to_string($result), $d->get("Error while adding the file monitor.") );
++            #$sd->dlg_error_message( Gnome2::VFS->result_to_string($result), $d->get("Error while adding the file monitor.") );
+             return FALSE;
+         }
+ 
+@@ -5446,7 +5446,8 @@
+         my $key = shift;
+ 
+         #cancel handle
+-        if ( exists $session_screens{$key}->{'handle'} ) {
++        #if ( exists $session_screens{$key}->{'handle'} ) {
++        if ( defined $session_screens{$key}->{'handle'} ) {
+             $session_screens{$key}->{'handle'}->cancel;
+         }
+ 
+@@ -5647,7 +5648,8 @@
+                 return FALSE;
+             }
+ 
+-            if ( exists $session_screens{$key}->{'handle'} ) {
++            #if ( exists $session_screens{$key}->{'handle'} ) {
++            if ( defined $session_screens{$key}->{'handle'} ) {
+ 
+                 #cancel handle
+                 $session_screens{$key}->{'handle'}->cancel;

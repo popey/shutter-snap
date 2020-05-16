@@ -42,11 +42,12 @@ apps:
   shutter:
     common-id: org.shutter-project.Shutter
     command: desktop-launch $SNAP/bin/shutter
+    #command: desktop-launch /usr/bin/perl -d:Trace $SNAP/bin/shutter
     plugs:
       - x11
       - desktop
       - desktop-legacy
-      - pulseaudio
+      - auto-playback
       - home
       - removable-media
       - gsettings
@@ -64,8 +65,12 @@ apps:
       XDG_DATA_DIRS: $SNAP/share:$XDG_DATA_DIRS
 
 parts:
+  patches:
+    plugin: dump
+    source: snap/local
+    prime: [-*]
   shutter:
-    after: [desktop-gtk2]
+    after: [desktop-gtk2, patches]
     plugin: dump
     source: https://launchpad.net/shutter/0.9x/0.94.3/+download/shutter-0.94.3.tar.gz
     build-packages:
@@ -73,11 +78,13 @@ parts:
       - libxml-sax-perl
     override-build: |
       snapcraftctl build
+      patch -p 0 ${SNAPCRAFT_PART_INSTALL}/bin/shutter < $SNAPCRAFT_STAGE/shutter.patch
       sed -i 's/convert/convert\-im6/g' ${SNAPCRAFT_PART_INSTALL}/bin/shutter
       rm $SNAPCRAFT_PART_INSTALL/usr/share/perl5/XML/SAX/ParserDetails.ini
       cp $SNAPCRAFT_PART_INSTALL/etc/perl/XML/SAX/ParserDetails.ini $SNAPCRAFT_PART_INSTALL/usr/share/perl5/XML/SAX/ParserDetails.ini
     stage-packages:
       - libgtk2-perl
+      - libgtk2-trayicon-perl
       - libglib-perl
       - libgnomevfs2-0
       - libgnome2-perl
@@ -119,7 +126,7 @@ parts:
       - libatk-adaptor
       - libgail-common
       - libcanberra-gtk-module
-      #- libdevel-trace-perl
+      - libdevel-trace-perl
       - libxml-sax-expat-perl
   desktop-gtk2:
     build-packages:
