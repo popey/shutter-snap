@@ -1,4 +1,5 @@
 name: shutter
+adopt-info: shutter
 version: '0.94.3'
 summary: feature-rich screenshot program
 description: |
@@ -40,9 +41,10 @@ plugs:
 
 apps: 
   shutter:
-    common-id: org.shutter-project.Shutter
+    common-id: org.shutterproject.shutter
     command: desktop-launch $SNAP/bin/shutter
     #command: desktop-launch /usr/bin/perl -d:Trace $SNAP/bin/shutter
+    desktop: share/applications/shutter.desktop
     plugs:
       - x11
       - desktop
@@ -76,12 +78,16 @@ parts:
     build-packages:
       - sed
       - libxml-sax-perl
+    override-pull: |
+      snapcraftctl pull
+      patch -Np0 -i $SNAPCRAFT_STAGE/shutter.patch bin/shutter
+      sed -i 's/convert/convert\-im6/g' bin/shutter
+      sed -i 's|Icon=.*|Icon=/share/icons/hicolor/scalable/apps/shutter.svg|' share/applications/shutter.desktop
     override-build: |
       snapcraftctl build
-      patch -p 0 ${SNAPCRAFT_PART_INSTALL}/bin/shutter < $SNAPCRAFT_STAGE/shutter.patch
-      sed -i 's/convert/convert\-im6/g' ${SNAPCRAFT_PART_INSTALL}/bin/shutter
       rm $SNAPCRAFT_PART_INSTALL/usr/share/perl5/XML/SAX/ParserDetails.ini
       cp $SNAPCRAFT_PART_INSTALL/etc/perl/XML/SAX/ParserDetails.ini $SNAPCRAFT_PART_INSTALL/usr/share/perl5/XML/SAX/ParserDetails.ini
+    parse-info: [share/appdata/shutter.appdata.xml]
     stage-packages:
       - libgtk2-perl
       - libgtk2-trayicon-perl
